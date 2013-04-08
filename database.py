@@ -1,8 +1,5 @@
-##TODO: DB reworked from MySQL to sqlite, many bugs here
-
 from multiprocessing import Process, Queue
-import sqlite3 as sqlite
-import os
+import MySQLdb
 import logger
 
 class database:
@@ -15,7 +12,6 @@ class database:
                 self.proc = Process(target=self.loop)
                 self.conn = None
                 self.logger = logger.logger(self)
-                self.cursor = None
 
         def start(self):
                 self.connect()
@@ -29,15 +25,9 @@ class database:
                 self.queue.put(command, block=False)
 
         def connect(self):
-                if os.path.isfile(self.options.db):
-                        self.logger.info("Using exiting database: %s" % (self.options.db))
-                else:
-                        self.logger.info("New database created: %s" % (self.options.db))
-
                 try:
-                        self.conn = sqlite.connect(self.options.db)
-                        self.cursor = self.conn.cursor()
-                except sqlite.Error, e:
+                        self.conn = MySQLdb.connect(host = self.options.db_host, user = self.options.db_user, passwd = self.options.db_password, db = self.options.db_database)
+                except MySQLdb.Error, e:
                         self.logger.error("Could not connect to database: %s" % (e[1]))
                         exit(1)
         
@@ -47,20 +37,16 @@ class database:
                         if command == self._stop:
                                 break
                         self.process(command)
-                        ## TODO: maybe commit later?
-                        #self.conn.commit()
 
         def process(self, statement):
-
-                return
-                ## tmp db remove 
-                command, args = statement
                 try:
-                        self.cursor.execute(command, args)
-                except (AttributeError, sqlite.OperationalError, sqlite.ProgrammingError), e:
-                        self.logger.warn("Fail to process SQL statement: (%s, %s): %s" % (command, args, e[0]))
+                        self.conn.cursor().execute(statement)
+                except (AttributeError, MySQLdb.OperationalError):
+                        self.connect()
+                        self.conn.cursor().execute(statement)
+                except MySQLdb.ProgrammingError, e:
+                        self.logger.warn("Fail to process SQL statement: %s : %s" % (statement, e[1]))
 
-        # TODO: remove this shit
         def escape(self, string):
-                return string
+                return self.conn.escape_string(string)
 

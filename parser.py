@@ -121,7 +121,7 @@ class parser:
                 self.http_sens_cookies = {
                                            "vkontakte.ru" : ["remixsid"],
                                            "vk.com" : ["remixsid"],
-                                           "facebook.com" : ["c_user", "xs", "sid"],
+                                           "facebook.com" : ["c_user", "xs", "datr", "lu"],
                                            "yahoo.com" : ["Y"],
                                            "reddit.com" : ["reddit_session"],
                                            "myspace.com" : ["SessionDDF2"],
@@ -170,7 +170,6 @@ class parser:
                 requests = []
                 requests_count = 0
 
-		print "http"
                 # split packet by large parts, and trying to determine its type(request/response)
                 payloads = self.data.split('\r\n\r\n')
                 for payload in payloads:
@@ -302,7 +301,7 @@ class parser:
                                         request['data'] = ''
 
                                 self.database.push(("INSERT INTO http_log(date, ip, method, host, url, ua, ref, ctype, auth, cookie, post_data) VALUES (NOW(),INET_ATON(?), ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.src, req_method, req_headers['Host'], req_url, req_headers['User-Agent'], req_headers['Referer'], req_headers['Content-Type'], req_headers['Authorization'], req_headers['Cookie'], request['data'])))
-				print  request['data']
+                                self.logger.info("HTTP: %s %s %s %s %s %s %s %s %s %s" % (self.src, req_method, req_headers['Host'], req_url, req_headers['User-Agent'], req_headers['Referer'], req_headers['Content-Type'], req_headers['Authorization'], req_headers['Cookie'], request['data']))
 
 
         def httpCheckSensParams(self, roots, url_params):
