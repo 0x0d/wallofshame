@@ -22,8 +22,7 @@ class p0f_sniffer:
         def sniff(self):
                 # Start Scapy sniffer on interface
                 try:
-                        scapy.sniff(iface = self.options.listen_interface, prn = self.update_os_info, store = 0)
-                        #scapy.sniff(iface = self.options.listen_interface, prn = self.update_os_info, filter = self.options.p0f_filter, store = 0)
+                        scapy.sniff(iface = self.options.listen_interface, prn = self.update_os_info, filter = self.options.p0f_filter, store = 0)
                 except socket.error, e:
                         self.logger.error("P0f sniffer error on %s: %s" % (self.options.listen_interface, e[1]))
 

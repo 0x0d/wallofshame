@@ -137,7 +137,7 @@ class parser:
                                            "moikrug.ru" : ["yandexuid", "yandex_login", "Session_id"],
                                            "narod.ru" : ["yandexuid", "yandex_login", "Session_id"],
                                            "livejournal.com" : ["ljmastersession", "ljloggedin", "ljsession"],
-                                           "mail.ru" : ["Mpop", "Mpopl"],
+                                           "mail.ru" : ["Mpop"],
                                            "habrahabr.ru" : ["PHPSESSID", "hsec_id"],
                                            "icq.com" : ["karma_login", "karma_session","karma_service"],
                                            "youtube.com" : ["LOGIN_INFO"],
@@ -300,7 +300,7 @@ class parser:
                                 if not 'data' in request:
                                         request['data'] = ''
 
-                                self.database.push(("INSERT INTO http_log(date, ip, method, host, url, ua, ref, ctype, auth, cookie, post_data) VALUES (NOW(),INET_ATON(?), ?, ?, ?, ?, ?, ?, ?, ?, ?);", (self.src, req_method, req_headers['Host'], req_url, req_headers['User-Agent'], req_headers['Referer'], req_headers['Content-Type'], req_headers['Authorization'], req_headers['Cookie'], request['data'])))
+                                self.database.push("INSERT INTO http_log(date, ip, method, host, url, ua, ref, ctype, auth, cookie, post_data) VALUES (NOW(),INET_ATON('%s'), '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');" % (self.src, self.database.escape(req_method), self.database.escape(req_headers['Host']), self.database.escape(req_url), self.database.escape(req_headers['User-Agent']), self.database.escape(req_headers['Referer']), self.database.escape(req_headers['Content-Type']), self.database.escape(req_headers['Authorization']), self.database.escape(req_headers['Cookie']), self.database.escape(request['data'])))
                                 self.logger.info("HTTP: %s %s %s %s %s %s %s %s %s %s" % (self.src, req_method, req_headers['Host'], req_url, req_headers['User-Agent'], req_headers['Referer'], req_headers['Content-Type'], req_headers['Authorization'], req_headers['Cookie'], request['data']))
 
 

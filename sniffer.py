@@ -72,14 +72,17 @@ class sniffer:
                         try:
                                 scapy.sniff(iface = self.options.listen_interface, prn = self.pkt_callback, lfilter = self.pkt_check, filter = self.options.filter, store = 0)
                         except socket.error, e:
-                                self.logger.error("Sniffer error on %s: %s" % (self.options.listen_interface, e[1]))
+                                self.logger.error("Sniffer error on %s: %s" % (self.options.listen_interface, e))
                 else:
                         self.logger.info("Using pcap file: %s" % (self.options.pcap_file))
                         pcapr = scapy.PcapReader(self.options.pcap_file)
                         while 1:
-                                pkt = pcapr.next()
-                                if self.pkt_check(pkt):
+                                try:
+                                    pkt = pcapr.next()
+                                    if self.pkt_check(pkt):
                                         self.pkt_callback(pkt)
+                                except scapy.StopIteration, e:
+                                    break
 
         def pkt_is_last(self, pkt):
                 if pkt['TCP'].flags == 17 or pkt['TCP'].flags == 25:
